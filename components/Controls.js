@@ -13,6 +13,7 @@ import {
   TopBar,
   ProgressBar
 } from './'
+import {StyledPlayButton} from "./StyledPlayButton";
 
 const styles = StyleSheet.create({
   container: {
@@ -128,7 +129,8 @@ class Controls extends Component {
       theme,
       inlineOnly,
       settings,
-      onSettingsPress
+      onSettingsPress,
+      alternatePlayBtn
     } = this.props;
 
     const { center, ...controlBar } = theme;
@@ -145,12 +147,22 @@ class Controls extends Component {
             fullscreen={fullscreen}
           />
           <Animated.View style={[styles.flex, { transform: [{ scale: this.scale }] }]}>
-            <PlayButton
-              onPress={() => this.props.togglePlay()}
-              paused={paused}
-              loading={loading}
-              theme={center}
-            />
+            {
+              alternatePlayBtn ?
+                (
+                  <StyledPlayButton
+                    onPress={() => this.props.togglePlay()}
+                  />
+                ) :
+                (
+                  <PlayButton
+                    onPress={() => this.props.togglePlay()}
+                    paused={paused}
+                    loading={loading}
+                    theme={center}
+                  />
+                )
+            }
           </Animated.View>
           <ControlBar
             showMute={false}
@@ -202,7 +214,8 @@ Controls.propTypes = {
   title: PropTypes.string.isRequired,
   theme: PropTypes.object.isRequired,
   settings: PropTypes.bool.isRequired,
-  onSettingsPress: PropTypes.func.isRequired
+  onSettingsPress: PropTypes.func.isRequired,
+  alternatePlayBtn: PropTypes.bool.isRequired
 };
 
 export { Controls }
