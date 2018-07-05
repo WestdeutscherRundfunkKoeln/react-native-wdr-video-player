@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 const backgroundColor = 'rgba(255, 255, 255, 0.7)';
-const imgSource = require('../assets/img/icoPlayVideo.png');
+const videoImgSource = require('../assets/img/icoPlayVideo.png');
+const audioImgSource = require('../assets/img/icoPlayAudio.png');
 
 const styles = StyleSheet.create({
   playButton: {
@@ -11,13 +12,18 @@ const styles = StyleSheet.create({
     height: 35,
     width: 35
   },
+  playButtonContainer: {
+    backgroundColor,
+    height: 75,
+    width: 75,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   playContainer: {
     flex: 1,
-    backgroundColor,
     alignItems: 'center',
-    justifyContent: 'center',
-    height: 75,
-    width: 75
+    justifyContent: 'center'
   }
 });
 
@@ -26,13 +32,20 @@ const StyledPlayButton = props => (
     <TouchableOpacity
       onPress={() => props.onPress()}
     >
-      <Image style={styles.playButton} source={imgSource} resizeMode='contain' />
+      <View style={styles.playButtonContainer}>
+        {
+          props.mediaType === 'video' ?
+            <Image style={styles.playButton} source={videoImgSource} resizeMode='contain' /> :
+            <Image style={styles.playButton} source={audioImgSource} resizeMode='contain' />
+        }
+      </View>
     </TouchableOpacity>
   </View>
 );
 
 StyledPlayButton.propTypes = {
-  onPress: PropTypes.func.isRequired
+  onPress: PropTypes.func.isRequired,
+  mediaType: PropTypes.oneOf(['video', 'audio'])
 };
 
 export { StyledPlayButton };

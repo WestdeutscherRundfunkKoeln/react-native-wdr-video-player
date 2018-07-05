@@ -365,7 +365,9 @@ class Video extends Component {
       inlineOnly,
       playInBackground,
       playWhenInactive,
-      onSettingsPress
+      onSettingsPress,
+      alternatePlayBtn,
+      mediaType
     } = this.props;
 
     const inline = {
@@ -436,6 +438,8 @@ class Video extends Component {
           inlineOnly={inlineOnly}
           settings={!!onSettingsPress}
           onSettingsPress={() => onSettingsPress()}
+          alternatePlayBtn={alternatePlayBtn}
+          mediaType={mediaType}
         />
       </Animated.View>
     )
@@ -490,7 +494,8 @@ Video.propTypes = {
   storeMute: PropTypes.func,
   togglePlayCB: PropTypes.func,
   onSettingsPress: PropTypes.func,
-  alternatePlayBtn: PropTypes.bool
+  alternatePlayBtn: PropTypes.bool,
+  mediaType: PropTypes.oneOf(['video', 'audio'])
 };
 
 Video.defaultProps = {
@@ -521,7 +526,8 @@ Video.defaultProps = {
   theme: defaultTheme,
   resizeMode: 'contain',
   onSettingsPress: undefined,
-  alternatePlayBtn: false
+  alternatePlayBtn: false,
+  mediaType: 'video'
 };
 
 export default Video

@@ -130,7 +130,8 @@ class Controls extends Component {
       inlineOnly,
       settings,
       onSettingsPress,
-      alternatePlayBtn
+      alternatePlayBtn,
+      mediaType
     } = this.props;
 
     const { center, ...controlBar } = theme;
@@ -152,6 +153,7 @@ class Controls extends Component {
                 (
                   <StyledPlayButton
                     onPress={() => this.props.togglePlay()}
+                    mediaType={mediaType}
                   />
                 ) :
                 (
@@ -215,7 +217,8 @@ Controls.propTypes = {
   theme: PropTypes.object.isRequired,
   settings: PropTypes.bool.isRequired,
   onSettingsPress: PropTypes.func.isRequired,
-  alternatePlayBtn: PropTypes.bool.isRequired
+  alternatePlayBtn: PropTypes.bool.isRequired,
+  mediaType: PropTypes.oneOf(['video', 'audio']).isRequired
 };
 
 export { Controls }
