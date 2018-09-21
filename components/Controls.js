@@ -31,7 +31,8 @@ class Controls extends Component {
     this.state = {
       hideControls: false,
       seconds: 0,
-      seeking: false
+      seeking: false,
+      firstToggle: true
     };
     this.animControls = new Animated.Value(1);
     this.scale = new Animated.Value(1);
@@ -96,16 +97,44 @@ class Controls extends Component {
     ]).start(() => this.setState({ hideControls: true, seconds: 0 }))
   }
 
-  hiddenControls() {
+  hiddenControls(toggled) {
     const {
       paused,
       mediaType,
       alternatePlayBtn
     } = this.props;
     Animated.timing(this.progressbar, { toValue: 0, duration: 200 }).start()
+    return toggled ?
+      this.firstLayer(mediaType, alternatePlayBtn) :
+      this.staticControls(paused, mediaType, alternatePlayBtn);
+  }
+
+  firstLayer(mediaType, alternatePlayBtn) {
+    return (
+      <Animated.View style={styles.container}>
+        <Animated.View style={styles.flex}>
+          {
+            alternatePlayBtn ?
+              (
+                <StyledPlayButton 
+                  onPress={() => { this.setState({ firstToggle: false }); return this.props.togglePlay()}} 
+                  paused={true} 
+                  mediaType={mediaType}
+                />
+              ) :
+              (
+                <PlayButton onPress={() => this.props.togglePlay()} paused={true} mediaType={mediaType} theme={center} />
+              )
+          }
+        </Animated.View>
+      </Animated.View>
+    )
+  }
+
+  staticControls(paused, mediaType, alternatePlayBtn) {
     return (
       <Touchable onPress={() => this.showControls()}>
-        <Animated.View style={[styles.container, , { opacity: this.animControls }]}>
+        <Animated.View style={[styles.container, { opacity: this.animControls }]}>
           <Animated.View style={[styles.flex, { transform: [{ scale: this.scale }] }]}>
             {
               alternatePlayBtn ?
@@ -113,10 +142,10 @@ class Controls extends Component {
                   <StyledPlayButton onPress={() => this.props.togglePlay()} paused={paused} mediaType={mediaType} />
                 ) :
                 (
-                  <PlayButton onPress={() => this.props.togglePlay()} paused={paused} loading={loading} theme={center} />
+                  <PlayButton onPress={() => this.props.togglePlay()} paused={paused} mediaType={mediaType} theme={center} />
                 )
             }
-            <Animated.View style={{ paddingBottom: this.progressbar }}>
+            <Animated.View style={{ paddingBottom: this.progressBar }}>
               <ProgressBar theme={this.props.theme.progress} progress={this.props.progress} />
             </Animated.View>
           </Animated.View>
@@ -211,7 +240,7 @@ class Controls extends Component {
   render() {
     if (this.props.loading) return this.loading()
     if (this.state.hideControls) {
-      return this.hiddenControls()
+      return this.hiddenControls(this.state.firstToggle)
     }
     return this.displayedControls()
   }
