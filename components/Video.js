@@ -9,7 +9,8 @@ import {
   Animated,
   Image,
   Alert,
-  Platform
+  Platform,
+  View
 } from 'react-native'
 import VideoPlayer from 'react-native-video'
 import KeepAwake from 'react-native-keep-awake'
@@ -17,6 +18,7 @@ import Orientation from 'react-native-orientation'
 import Icons from 'react-native-vector-icons/MaterialIcons'
 import { Controls } from './'
 import { checkSource } from './utils'
+import AudioPlayer from './AudioPlayer'
 const Win = Dimensions.get('window');
 const backgroundColor = '#000';
 
@@ -51,6 +53,9 @@ const defaultTheme = {
   progress: '#FFF',
   loading: '#FFF',
   settings: '#FFF',
+  error: '#FFF',
+  background: '#000',
+  buttonBackground: '#FFF'
 };
 
 class Video extends Component {
@@ -66,7 +71,8 @@ class Video extends Component {
       progress: 0,
       currentTime: 0,
       seeking: false,
-      renderError: false
+      renderError: false,
+      minimized: false
     };
     this.animInline = new Animated.Value(Win.width * 0.5625);
     this.animFullscreen = new Animated.Value(Win.width * 0.5625);
@@ -118,6 +124,15 @@ class Video extends Component {
     })
   }
 
+  onLoadAudio(data) {
+    if (!this.state.loading) return;
+    this.setState({
+      paused: !this.props.autoPlay,
+      loading: false,
+      duration: data.duration
+    });
+  }
+
   // onBuffer() {
   //   // console.log('buffering')
   //   this.setState({ loading: true, paused: true })
@@ -125,11 +140,11 @@ class Video extends Component {
 
   onEnd() {
     this.props.onEnd();
-    const { loop } = this.props;
+    const { loop, minimized } = this.props;
     if (!loop) this.pause();
     this.onSeekRelease(0);
     this.setState({ currentTime: 0 }, () => {
-      if (!loop) this.controls.showControls()
+      if (!loop && !minimized) this.controls.showControls()
     })
   }
 
@@ -215,6 +230,12 @@ class Video extends Component {
 
   play() {
     if (this.state.paused) this.togglePlay()
+  }
+
+  toggleAudioPlay() {
+    this.setState({ paused: !this.state.paused }, () => {
+     this.props.onPlay(!this.state.paused);
+    });
   }
 
   togglePlay() {
@@ -322,6 +343,7 @@ class Video extends Component {
       alignSelf: 'stretch'
     };
     const textStyle = { color: 'white', padding: 10 };
+
     return (
       <Animated.View
         style={[styles.background, fullScreen ? styles.fullScreen : inline]}
@@ -330,7 +352,7 @@ class Video extends Component {
         <Icons
           name="replay"
           size={60}
-          color={this.props.theme}
+          color={this.props.theme.error}
           onPress={() => this.setState({ renderError: false })}
         />
       </Animated.View>
@@ -367,6 +389,7 @@ class Video extends Component {
       resizeMode,
       onMorePress,
       inlineOnly,
+      minimized,
       playInBackground,
       playWhenInactive,
       onSettingsPress,
@@ -383,7 +406,6 @@ class Video extends Component {
       useTextureView,
       bufferConfig
     } = this.props;
-
     const inline = {
       height: inlineHeight,
       alignSelf: 'stretch'
@@ -404,10 +426,10 @@ class Video extends Component {
           fullScreen ? null : style
         ]}
       >
-        <StatusBar hidden={fullScreen} />
+        { <StatusBar hidden={fullScreen} /> }
         {
           ((loading && placeholder) || currentTime < 0.01) &&
-          <Image resizeMode="cover" style={styles.image} {...checkSource(placeholder)} />
+            <Image resizeMode="cover" style={styles.image} {...checkSource(placeholder)} />
         }
         <VideoPlayer
           ref={(ref) => { this.player = ref }}
@@ -460,7 +482,7 @@ class Video extends Component {
           more={!!onMorePress}
           onMorePress={() => onMorePress()}
           theme={setTheme}
-          inlineOnly={inlineOnly}
+          minimized={minimized}
           settings={!!onSettingsPress}
           onSettingsPress={() => onSettingsPress()}
           alternatePlayBtn={alternatePlayBtn}
@@ -470,7 +492,80 @@ class Video extends Component {
     )
   }
 
+  renderMinimizedPlayer(renderError) {
+    const { paused, muted, loading, progress, duration, currentTime } = this.state;
+    const { url, loop, title, logo, rate, style, volume, placeholder, theme,
+      onTimedMetadata, resizeMode, onMorePress, inlineOnly, minimized,
+      playInBackground, playWhenInactive, onSettingsPress, onClosePress,
+      alternatePlayBtn, mediaType } = this.props;
+    const inline = {
+      height: 150,
+      alignSelf: 'stretch'
+    };
+
+    const setTheme = {
+      ...defaultTheme,
+      ...theme
+    };
+
+    const audioplayerStyle = {
+      flexDirection: 'row',
+      alignSelf: 'stretch',
+      height: style.height,
+      padding: style.padding,
+    };
+
+    return (
+      <View style={ style } >
+        <VideoPlayer
+          {...checkSource(url)}
+          paused={paused}
+          resizeMode={resizeMode}
+          repeat={loop}
+          style={inline}
+          ref={(ref) => { this.player = ref }}
+          rate={rate}
+          volume={volume}
+          muted={muted}
+          playInBackground={playInBackground} // Audio continues to play when app entering background.
+          playWhenInactive={playWhenInactive} // [iOS] Video continues to play when control or notification center are shown.
+          // progressUpdateInterval={250.0}          // [iOS] Interval to fire onProgress (default to ~250ms)
+          onLoadStart={() => this.onLoadStart()} // Callback when audio starts to load
+          onLoad={e => this.onLoadAudio(e)} // Callback when audio loads
+          onProgress={e => { this.progress(e); }} // Callback every ~250ms with currentTime
+          onEnd={() => this.onEnd()}
+          onError={e => this.onError(e)}
+          // onBuffer={() => this.onBuffer()} // Callback when remote video is buffering
+          onTimedMetadata={e => onTimedMetadata(e)} // Callback when the stream receive some metadata
+        />
+        <AudioPlayer
+              style={audioplayerStyle}
+              barFillColor={'rgb(0, 115, 121)'}
+              barBackgroundColor={'rgb(255, 255, 255)'}
+              buttonBackgroundColor={'rgb(255, 255, 255)'}
+              onClosePress={onClosePress}
+              progress={progress}
+              theme={setTheme}
+              currentTime={currentTime}
+              duration={duration}
+              togglePlay={() => this.toggleAudioPlay()}
+              paused={paused}
+              loading={loading}
+              onSeek={val => this.seek(val)}
+              onSeekRelease={pos => this.onSeekRelease(pos)}
+              onPressRetry={() => this.setState({ renderError: false })}
+              renderError={renderError}
+        />
+      </View>
+    )
+  }
+
+
+
   render() {
+    if (this.props.minimized) {
+      return this.renderMinimizedPlayer(this.state.renderError);
+    }
     if (this.state.renderError) return this.renderError()
     return this.renderPlayer()
   }
@@ -496,6 +591,7 @@ Video.propTypes = {
   loop: PropTypes.bool,
   autoPlay: PropTypes.bool,
   inlineOnly: PropTypes.bool,
+  minimized: PropTypes.bool,
   fullScreenOnly: PropTypes.bool,
   playInBackground: PropTypes.bool,
   playWhenInactive: PropTypes.bool,
@@ -551,6 +647,7 @@ Video.defaultProps = {
   loop: false,
   autoPlay: false,
   inlineOnly: false,
+  minimized: false,
   fullScreenOnly: false,
   playInBackground: false,
   playWhenInactive: false,
