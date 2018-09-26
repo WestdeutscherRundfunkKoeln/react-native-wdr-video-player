@@ -1,0 +1,4 @@
+# Just for development reasons
+*.tgz
+.idea
+node_modules
