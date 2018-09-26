@@ -39,6 +39,7 @@ class Controls extends Component {
   }
 
   componentDidMount() {
+    this.hideControls();
     this.setTimer()
   }
 
@@ -96,11 +97,29 @@ class Controls extends Component {
   }
 
   hiddenControls() {
+    const {
+      paused,
+      mediaType,
+      alternatePlayBtn
+    } = this.props;
     Animated.timing(this.progressbar, { toValue: 0, duration: 200 }).start()
     return (
-      <Touchable style={styles.container} onPress={() => this.showControls()}>
-        <Animated.View style={[styles.container, { paddingBottom: this.progressbar }]}>
-          <ProgressBar theme={this.props.theme.progress} progress={this.props.progress} />
+      <Touchable onPress={() => this.showControls()}>
+        <Animated.View style={[styles.container, , { opacity: this.animControls }]}>
+          <Animated.View style={[styles.flex, { transform: [{ scale: this.scale }] }]}>
+            {
+              alternatePlayBtn ?
+                (
+                  <StyledPlayButton onPress={() => this.props.togglePlay()} paused={paused} mediaType={mediaType} />
+                ) :
+                (
+                  <PlayButton onPress={() => this.props.togglePlay()} paused={paused} loading={loading} theme={center} />
+                )
+            }
+            <Animated.View style={{ paddingBottom: this.progressbar }}>
+              <ProgressBar theme={this.props.theme.progress} progress={this.props.progress} />
+            </Animated.View>
+          </Animated.View>
         </Animated.View>
       </Touchable>
     )

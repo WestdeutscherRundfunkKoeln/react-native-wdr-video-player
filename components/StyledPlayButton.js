@@ -3,21 +3,18 @@ import PropTypes from 'prop-types';
 import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 const backgroundColor = 'rgba(255, 255, 255, 0.7)';
-const videoImgSource = require('../assets/img/icoPlayVideo.png');
-const audioImgSource = require('../assets/img/icoPlayAudio.png');
-const pauseImgSource = require('../assets/img/icoPause.png');
+const videoImgSource = require('../assets/img/buttonPlayVideo.png');
+const audioImgSource = require('../assets/img/buttonPlayAudio.png');
+const pauseImgSource = require('../assets/img/buttonPause.png');
 
 const styles = StyleSheet.create({
   playButton: {
     opacity: 0.9,
-    height: 35,
-    width: 35
+    height: 75,
+    width: 75,
   },
   playButtonContainer: {
     backgroundColor,
-    height: 75,
-    width: 75,
-    borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center'
   },
