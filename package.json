@@ -1,6 +1,6 @@
 {
   "name": "react-native-af-video-player",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-jest": "21.2.0",
