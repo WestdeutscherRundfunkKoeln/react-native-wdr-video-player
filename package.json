@@ -1,5 +1,5 @@
 {
-  "name": "react-native-af-video-player",
+  "name": "react-native-wdr-video-player",
   "version": "0.4.0",
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -10,7 +10,7 @@
     "react-test-renderer": "16.0.0-beta.5"
   },
   "description": "Fork of the great abbasfreestyle/react-native-af-video-player. A customisable React Native video player for Android and IOS",
-  "homepage": "https://github.com/no-weller/react-native-af-video-player#readme",
+  "homepage": "https://github.com/WestdeutscherRundfunkKoeln/react-native-wdr-video-player#readme",
   "keywords": [
     "react-component",
     "react-native",
@@ -22,14 +22,14 @@
   ],
   "maintainers": [
     {
-      "name": "no-weller",
-      "email": "git@blackthorn-hill.de"
+      "name": "Westdeutscher Rundfunk",
+      "email": "websupport@wdr.de"
     }
   ],
   "license": "MIT",
   "author": {
     "name": "Nils Weller",
-    "email": "git@blackthorn-hill.de",
-    "url": "https://github.com/no-weller"
+    "email": "websupport@wdr.de",
+    "url": "https://github.com/WestdeutscherRundfunkKoeln"
   }
 }
