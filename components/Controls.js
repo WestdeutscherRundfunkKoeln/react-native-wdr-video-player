@@ -26,13 +26,13 @@ const styles = StyleSheet.create({
 });
 
 class Controls extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       hideControls: false,
       seconds: 0,
       seeking: false,
-      firstToggle: true
+      firstToggle: props.paused
     };
     this.animControls = new Animated.Value(1);
     this.scale = new Animated.Value(1);
