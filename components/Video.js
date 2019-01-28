@@ -416,6 +416,15 @@ class Video extends Component {
       ...theme
     };
 
+    const trackInformation =
+          Platform.OS === 'android' ?
+          {
+            textTracks: textTracks,
+            selectedTextTrack: selectedTextTrack
+          }
+          :
+          {}
+
     return (
       <Animated.View
         style={[
@@ -447,9 +456,7 @@ class Video extends Component {
           repeat={loop}
           resizeMode={resizeMode}
           selectedAudioTrack={selectedAudioTrack}
-          selectedTextTrack={selectedTextTrack}
           stereoPan={stereoPan}
-          textTracks={textTracks}
           useTextureView={useTextureView}
           volume={volume}
           style={fullScreen ? styles.fullScreen : inline}
@@ -462,6 +469,7 @@ class Video extends Component {
           onError={e => this.onError(e)}
           // onBuffer={() => this.onBuffer()} // Callback when remote video is buffering
           onTimedMetadata={e => onTimedMetadata(e)} // Callback when the stream receive some metadata
+          {...trackInformation}
         />
         <Controls
           ref={(ref) => { this.controls = ref }}
