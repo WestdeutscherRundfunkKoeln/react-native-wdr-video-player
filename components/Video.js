@@ -72,8 +72,10 @@ class Video extends Component {
       currentTime: 0,
       seeking: false,
       renderError: false,
-      minimized: false
+      minimized: false,
     };
+    let startPos = props.startPos;
+
     this.animInline = new Animated.Value(Win.width * 0.5625);
     this.animFullscreen = new Animated.Value(Win.width * 0.5625);
     this.BackHandler = this.BackHandler.bind(this);
@@ -91,10 +93,12 @@ class Video extends Component {
   }
 
   onLoadStart() {
+    this.startPos = this.props.startPos;
     this.setState({ paused: true, loading: true })
   }
 
   onLoad(data) {
+    this.setStartPos();
     if (!this.state.loading) return;
     this.props.onLoad(data);
     const { height, width } = data.naturalSize;
@@ -236,6 +240,15 @@ class Video extends Component {
     this.setState({ paused: !this.state.paused }, () => {
      this.props.onPlay(!this.state.paused);
     });
+  }
+
+  setStartPos() {
+    if ( this.state.paused ) {
+      if ( this.startPos !== 0 ) {
+        this.player.seek(this.startPos);
+        this.startPos = 0;
+      }
+    }
   }
 
   togglePlay() {
@@ -424,6 +437,8 @@ class Video extends Component {
           }
           :
           {}
+
+
 
     return (
       <Animated.View
@@ -699,7 +714,8 @@ Video.defaultProps = {
   },
   stereoPan: 0.0,
   textTracks: [],
-  useTextureView: false
+  useTextureView: false,
+  startPos: 0,
 };
 
 export default Video
