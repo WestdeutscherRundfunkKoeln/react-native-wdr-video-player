@@ -108,6 +108,7 @@ selectedAudioTrack    | object   | No       | {}                        | Config
 selectedTextTrack     | object   | No       | {}                        | Configure which text track (caption or subtitle), if any, is shown. See also: [selectedTextTrack](#selectedTextTrack)
 stereoPan             | number   | No       | 0.0                       | Adjust the balance of the left and right audio channels. Any value between -1.0 and 1.0 is accepted. [stereoPan](#stereoPan)
 textTracks            | array    | No       | []                        | List of "sidecar" text tracks, [textTracks](#textTracks)
+startPos              | number   | No       | 0.0                       | Indicates the start position in seconds after loading the video.
 
 ## Props
 
