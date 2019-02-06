@@ -71,7 +71,6 @@ Prop                  | Type     | Required | Default                   | Descri
 url                   | string, number | Yes |                          | A URL string (or number for local) is required.
 playbackConfig        | string   | No       | 'preload'                 | Sets the play and load strategy. Valid values are 'autoplay', 'preload' and 'postload'. 'autoplay' starts playing immediately. 'preload' pre-loads the video and waits for user actions. 'postload' shows a preview image and waits for user action. The video is loaded by the user action.
 previewImage          | string   | No       | ''                        | Defines the preview image that will be displayed on PlayBackConfig = 'postload'.
-startPos              | number   | No       | 0                         | Sets the starting position after loading the video or audio 
 loop                  | bool     | No       | false                     | Allows the video to continuously loop
 title                 | string   | No       | ''                        | Adds a title of your video at the top of the player
 placeholder           | string   | No       | undefined                 | Adds an image placeholder while it's loading and stopped at the beginning
