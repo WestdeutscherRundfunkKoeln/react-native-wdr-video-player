@@ -69,7 +69,8 @@ AppRegistry.registerComponent('VideoExample', () => VideoExample)
 Prop                  | Type     | Required | Default                   | Description
 --------------------- | -------- | -------- | ------------------------- | -----------
 url                   | string, number | Yes |                          | A URL string (or number for local) is required.
-autoPlay              | bool     | No       | false                     | Autoplays the video as soon as it's loaded
+playbackConfig        | string   | No       | 'preload'                 | Sets the play and load strategy. Valid values are 'autoplay', 'preload' and 'postload'. 'autoplay' starts playing immediately. 'preload' pre-loads the video and waits for user actions. 'postload' shows a preview image and waits for user action. The video is loaded by the user action.
+previewImage          | string   | No       | ''                        | Defines the preview image that will be displayed on PlayBackConfig = 'postload'.
 loop                  | bool     | No       | false                     | Allows the video to continuously loop
 title                 | string   | No       | ''                        | Adds a title of your video at the top of the player
 placeholder           | string   | No       | undefined                 | Adds an image placeholder while it's loading and stopped at the beginning
@@ -100,7 +101,7 @@ theme                 | object   | No       | all white                 | Pass i
 allowsExternalPlayback| bool     | No       | true                      | Indicates whether the player allows switching to external playback mode such as AirPlay or HDMI
 audioOnly             | bool     | No       | false                     | Indicates whether the player should only play audio track and instead of displaying the video track, show poster instead
 bufferConfig          | object   | No       | {}                        | Adjust the buffer settings. This prop takes an object with one or more of the properties listed in [bufferConfig](#bufferConfig)
-ignoreSilentSwitch    | string   | No       | 'inherit'                 | Controls th iOS silent switch behaivor, values listed in [ignoreSilentSwitch](#ignoreSilentSwitch)
+ignoreSilentSwitch    | string   | No       | 'inherit'                 | Controls the iOS silent switch behaivor, values listed in [ignoreSilentSwitch](#ignoreSilentSwitch)
 progressUpdateInterval| number   | No       | 250.0                     | Delay in milliseconds between onProgress events in milliseconds
 selectedAudioTrack    | object   | No       | {}                        | Configure which audio track, if any, is played. See also: [selectedAudioTrack](#selectedAudioTrack)
 selectedTextTrack     | object   | No       | {}                        | Configure which text track (caption or subtitle), if any, is shown. See also: [selectedTextTrack](#selectedTextTrack)

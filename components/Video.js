@@ -17,6 +17,7 @@ import KeepAwake from 'react-native-keep-awake'
 import Orientation from 'react-native-orientation'
 import Icons from 'react-native-vector-icons/MaterialIcons'
 import { Controls } from './'
+import { PreviewImage } from './PreviewImage'
 import { checkSource } from './utils'
 import AudioPlayer from './AudioPlayer'
 const Win = Dimensions.get('window');
@@ -37,6 +38,14 @@ const styles = StyleSheet.create({
     width: undefined,
     height: undefined,
     zIndex: 99
+  },
+  previewImage:{
+    ...StyleSheet.absoluteFillObject,
+    width: undefined,
+    height: undefined,
+    // height: 215,
+    // justifyContent: 'center',
+    // alignItems: 'center'
   }
 });
 
@@ -62,7 +71,8 @@ class Video extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      paused: !props.autoPlay,
+      paused: props.playbackConfig === 'autoplay' ? false : true,
+      newInstance: true,
       muted: false,
       fullScreen: false,
       inlineHeight: Win.width * 0.5625,
@@ -94,7 +104,7 @@ class Video extends Component {
 
   onLoadStart() {
     this.startPos = this.props.startPos;
-    this.setState({ paused: true, loading: true })
+    this.setState({ /*paused: true,*/ loading: true })
   }
 
   onLoad(data) {
@@ -108,7 +118,6 @@ class Video extends Component {
       (Win.width / this.props.lockRatio)
       : (Win.width * ratio);
     this.setState({
-      paused: !this.props.autoPlay,
       loading: false,
       inlineHeight,
       duration: data.duration
@@ -131,7 +140,7 @@ class Video extends Component {
   onLoadAudio(data) {
     if (!this.state.loading) return;
     this.setState({
-      paused: !this.props.autoPlay,
+      paused: false,
       loading: false,
       duration: data.duration
     });
@@ -252,7 +261,7 @@ class Video extends Component {
   }
 
   togglePlay() {
-    this.setState({ paused: !this.state.paused }, () => {
+    this.setState({ paused: !this.state.paused, newInstance: false }, () => {
       this.props.onPlay(!this.state.paused);
       Orientation.getOrientation((e, orientation) => {
         if (this.props.togglePlayCB) {
@@ -376,9 +385,105 @@ class Video extends Component {
     if (!this.state.paused) this.togglePlay();
   }
 
+  renderVideoPlayer() {
+    const {
+      fullScreen,
+      paused,
+      muted,
+      loading,
+      progress,
+      duration,
+      inlineHeight,
+      currentTime
+    } = this.state;
+
+    const {
+      url,
+      loop,
+      title,
+      rate,
+      style,
+      volume,
+      onTimedMetadata,
+      resizeMode,
+      playInBackground,
+      playWhenInactive,
+      allowsExternalPlayback,
+      audioOnly,
+      ignoreSilentSwitch,
+      progressUpdateInterval,
+      selectedAudioTrack,
+      selectedTextTrack,
+      stereoPan,
+      textTracks,
+      useTextureView,
+      bufferConfig,
+    } = this.props;
+
+    const inline = {
+      height: inlineHeight,
+      alignSelf: 'stretch'
+    };
+
+
+    const trackInformation =
+          Platform.OS === 'android' ?
+          {
+            textTracks: textTracks,
+            selectedTextTrack: selectedTextTrack
+          }
+          :
+          {}
+
+    return (
+        <VideoPlayer
+          ref={(ref) => { this.player = ref }}
+          {...checkSource(url)}
+          allowsExternalPlayback={allowsExternalPlayback}
+          audioOnly={audioOnly}
+          bufferConfig={bufferConfig}
+          ignoreSilentSwitch={ignoreSilentSwitch}
+          muted={muted}
+          paused={paused}
+          playInBackground={playInBackground} // Audio continues to play when app entering background.
+          playWhenInactive={playWhenInactive} // [iOS] Video continues to play when control or notification center are shown.
+          progressUpdateInterval={progressUpdateInterval} // [iOS] Interval to fire onProgress (default to ~250ms)
+          rate={rate}
+          repeat={loop}
+          resizeMode={resizeMode}
+          selectedAudioTrack={selectedAudioTrack}
+          stereoPan={stereoPan}
+          useTextureView={useTextureView}
+          volume={volume}
+          style={fullScreen ? styles.fullScreen : inline}
+
+          onAudioBecomingNoisy={() => this.onAudioBecomingNoisy()}
+          onLoadStart={() => this.onLoadStart()} // Callback when video starts to load
+          onLoad={e => this.onLoad(e)} // Callback when video loads
+          onProgress={e => this.progress(e)} // Callback every ~250ms with currentTime
+          onEnd={() => this.onEnd()}
+          onError={e => this.onError(e)}
+          // onBuffer={() => this.onBuffer()} // Callback when remote video is buffering
+          onTimedMetadata={e => onTimedMetadata(e)} // Callback when the stream receive some metadata
+          {...trackInformation}
+        />
+    );
+
+  }
+
+  renderPreviewImage(previewImage, style) {
+    return(
+      <PreviewImage
+        imageSource={previewImage}
+        imageStyle={style}
+      />
+    );
+  }
+
   renderPlayer() {
     const {
       fullScreen,
+      newInstance,
       paused,
       muted,
       loading,
@@ -417,7 +522,9 @@ class Video extends Component {
       stereoPan,
       textTracks,
       useTextureView,
-      bufferConfig
+      bufferConfig,
+      playbackConfig,
+      previewImage
     } = this.props;
     const inline = {
       height: inlineHeight,
@@ -452,40 +559,11 @@ class Video extends Component {
       >
         { <StatusBar hidden={fullScreen} /> }
         {
-          ((loading && placeholder) || currentTime < 0.01 || mediaType === 'audio') &&
-            <Image resizeMode="cover" style={styles.image} {...checkSource(placeholder)} />
+          ((loading && previewImage) || currentTime < 0.01 || mediaType === 'audio') &&
+            this.renderPreviewImage(previewImage, styles.image)
         }
-        <VideoPlayer
-          ref={(ref) => { this.player = ref }}
-          {...checkSource(url)}
-          allowsExternalPlayback={allowsExternalPlayback}
-          audioOnly={audioOnly}
-          bufferConfig={bufferConfig}
-          ignoreSilentSwitch={ignoreSilentSwitch}
-          muted={muted}
-          paused={paused}
-          playInBackground={playInBackground} // Audio continues to play when app entering background.
-          playWhenInactive={playWhenInactive} // [iOS] Video continues to play when control or notification center are shown.
-          progressUpdateInterval={progressUpdateInterval} // [iOS] Interval to fire onProgress (default to ~250ms)
-          rate={rate}
-          repeat={loop}
-          resizeMode={resizeMode}
-          selectedAudioTrack={selectedAudioTrack}
-          stereoPan={stereoPan}
-          useTextureView={useTextureView}
-          volume={volume}
-          style={fullScreen ? styles.fullScreen : inline}
-
-          onAudioBecomingNoisy={() => this.onAudioBecomingNoisy()}
-          onLoadStart={() => this.onLoadStart()} // Callback when video starts to load
-          onLoad={e => this.onLoad(e)} // Callback when video loads
-          onProgress={e => this.progress(e)} // Callback every ~250ms with currentTime
-          onEnd={() => this.onEnd()}
-          onError={e => this.onError(e)}
-          // onBuffer={() => this.onBuffer()} // Callback when remote video is buffering
-          onTimedMetadata={e => onTimedMetadata(e)} // Callback when the stream receive some metadata
-          {...trackInformation}
-        />
+        {playbackConfig === 'postload' && newInstance && mediaType !== 'audio' ?
+          this.renderPreviewImage(previewImage, styles.previewImage) : this.renderVideoPlayer()}
         <Controls
           ref={(ref) => { this.controls = ref }}
           toggleMute={() => this.toggleMute()}
@@ -537,7 +615,6 @@ class Video extends Component {
       height: style.height,
       padding: style.padding,
     };
-
     return (
       <View style={ style } >
         <VideoPlayer
@@ -612,7 +689,8 @@ Video.propTypes = {
     PropTypes.object
   ]),
   loop: PropTypes.bool,
-  autoPlay: PropTypes.bool,
+  playbackConfig: PropTypes.oneOf(['autoplay', 'preload', 'postload']),
+  previewImage: PropTypes.string,
   inlineOnly: PropTypes.bool,
   minimized: PropTypes.bool,
   fullScreenOnly: PropTypes.bool,
@@ -668,7 +746,8 @@ Video.defaultProps = {
   style: {},
   error: true,
   loop: false,
-  autoPlay: false,
+  playbackConfig: 'preload',
+  previewImage: '',
   inlineOnly: false,
   minimized: false,
   fullScreenOnly: false,
