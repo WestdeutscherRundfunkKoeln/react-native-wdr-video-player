@@ -18,7 +18,7 @@ import Orientation from 'react-native-orientation'
 import Icons from 'react-native-vector-icons/MaterialIcons'
 import { Controls } from './'
 import { PreviewImage } from './PreviewImage'
-import { checkSource } from './utils'
+import { checkSource, getWinWidth, getWinHeight, getInlineHeight, RECIPROCAL_PAGE_RATIO } from './utils'
 import AudioPlayer from './AudioPlayer'
 const Win = Dimensions.get('window');
 const backgroundColor = '#000';
@@ -75,7 +75,7 @@ class Video extends Component {
       newInstance: true,
       muted: false,
       fullScreen: false,
-      inlineHeight: Win.width * 0.5625,
+      inlineHeight: getInlineHeight(),
       loading: false,
       duration: 0,
       progress: 0,
@@ -86,8 +86,8 @@ class Video extends Component {
     };
     let startPos = props.startPos;
 
-    this.animInline = new Animated.Value(Win.width * 0.5625);
-    this.animFullscreen = new Animated.Value(Win.width * 0.5625);
+    this.animInline = new Animated.Value(getInlineHeight());
+    this.animFullscreen = new Animated.Value(getInlineHeight());
     this.BackHandler = this.BackHandler.bind(this);
     this.onRotated = this.onRotated.bind(this)
   }
@@ -113,10 +113,10 @@ class Video extends Component {
     this.props.onLoad(data);
     const { height, width } = data.naturalSize;
     const ratio = height === 'undefined' && width === 'undefined' ?
-      (9 / 16) : (height / width);
+      RECIPROCAL_PAGE_RATIO : (height / width);
     const inlineHeight = this.props.lockRatio ?
-      (Win.width / this.props.lockRatio)
-      : (Win.width * ratio);
+      (getWinWidth() / this.props.lockRatio)
+      : (getWinWidth() * ratio);
     this.setState({
       loading: false,
       inlineHeight,
@@ -129,7 +129,7 @@ class Video extends Component {
         if (this.props.fullScreenOnly) {
           this.setState({ fullScreen: true }, () => {
             this.props.onFullScreen(this.state.fullScreen);
-            this.animToFullscreen(Win.height);
+            this.animToFullscreen(getWinHeight());
             if (this.props.rotateToFullScreen) Orientation.lockToLandscape()
           })
         }
@@ -554,7 +554,8 @@ class Video extends Component {
           fullScreen ?
             (styles.fullScreen, { height: this.animFullscreen })
             : { height: this.animInline },
-          fullScreen ? null : style
+          fullScreen ? null : style,
+          fullScreen ? { width: getWinHeight()} : { width: getWinWidth()}
         ]}
       >
         { <StatusBar hidden={fullScreen} /> }
