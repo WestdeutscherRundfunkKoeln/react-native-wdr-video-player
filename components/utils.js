@@ -21,3 +21,10 @@ export const getWinHeight = () => {
 export const getInlineHeight = () => {
   return getWinWidth() * RECIPROCAL_PAGE_RATIO;
 };
+
+
+export const debug = (props, title, objekt) => {
+  if (props.debug) {
+      console.log(`-----> Player debug -> ${title}: ${JSON.stringify(objekt)}`);
+  }
+};

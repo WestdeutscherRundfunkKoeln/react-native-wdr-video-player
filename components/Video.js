@@ -18,7 +18,14 @@ import Orientation from 'react-native-orientation'
 import Icons from 'react-native-vector-icons/MaterialIcons'
 import { Controls } from './'
 import { PreviewImage } from './PreviewImage'
-import { checkSource, getWinWidth, getWinHeight, getInlineHeight, RECIPROCAL_PAGE_RATIO } from './utils'
+import {
+  checkSource,
+  getWinWidth,
+  getWinHeight,
+  getInlineHeight,
+  RECIPROCAL_PAGE_RATIO,
+  debug
+} from './utils'
 import AudioPlayer from './AudioPlayer'
 const Win = Dimensions.get('window');
 const backgroundColor = '#000';
@@ -72,6 +79,7 @@ class Video extends Component {
     super(props);
     this.state = {
       paused: props.playbackConfig === 'autoplay' ? false : true,
+      preLoad: props.playbackConfig === 'postload' ? false : true,
       newInstance: true,
       muted: false,
       fullScreen: false,
@@ -84,13 +92,16 @@ class Video extends Component {
       renderError: false,
       minimized: false,
     };
-    let startPos = props.startPos;
+    this.startPos = props.startPos;
+    debug(props, 'Constructor', {...this.state, startPos: this.startPos});
 
     this.animInline = new Animated.Value(getInlineHeight());
     this.animFullscreen = new Animated.Value(getInlineHeight());
     this.BackHandler = this.BackHandler.bind(this);
     this.onRotated = this.onRotated.bind(this)
   }
+
+
 
   componentDidMount() {
     Dimensions.addEventListener('change', this.onRotated);
@@ -102,12 +113,13 @@ class Video extends Component {
     BackHandler.removeEventListener('hardwareBackPress', this.BackHandler)
   }
 
-  onLoadStart() {
-    this.startPos = this.props.startPos;
+  onLoadStart(payload) {
+    debug(this.props, 'onLoadStart', payload);
     this.setState({ /*paused: true,*/ loading: true })
   }
 
   onLoad(data) {
+    debug(this.props, 'onLoad', data);
     this.setStartPos();
     if (!this.state.loading) return;
     this.props.onLoad(data);
@@ -138,6 +150,7 @@ class Video extends Component {
   }
 
   onLoadAudio(data) {
+    debug(this.props, 'onLoadAudio', data);
     if (!this.state.loading) return;
     this.setState({
       paused: false,
@@ -152,6 +165,7 @@ class Video extends Component {
   // }
 
   onEnd() {
+    debug(this.props, 'onEnd', '');
     this.props.onEnd();
     const { loop, minimized } = this.props;
     if (!loop) this.pause();
@@ -166,6 +180,7 @@ class Video extends Component {
   }
 
   onRotated({ window: { width, height } }) {
+    debug(this.props, 'onRotated', { window: { width, height } });
     // Add this condition incase if inline and fullscreen options are turned on
     if (this.props.inlineOnly) return;
     const orientation = width > height ? 'LANDSCAPE' : 'PORTRAIT';
@@ -195,6 +210,7 @@ class Video extends Component {
   ;}
 
   onSeekRelease(percent) {
+    debug(this.props, 'onSeekRelease', percent);
     const seconds = percent * this.state.duration;
     this.setState({ progress: percent, seeking: false }, () => {
       this.player.seek(seconds)
@@ -202,6 +218,7 @@ class Video extends Component {
   }
 
   onError(msg) {
+    debug(this.props, 'onError', msg);
     this.props.onError(msg);
     const { error } = this.props;
     this.setState({ renderError: true }, () => {
@@ -252,16 +269,16 @@ class Video extends Component {
   }
 
   setStartPos() {
-    if ( this.state.paused ) {
       if ( this.startPos !== 0 ) {
+        debug(this.props, 'setStartPos', this.startPos);
         this.player.seek(this.startPos);
         this.startPos = 0;
       }
-    }
   }
 
   togglePlay() {
-    this.setState({ paused: !this.state.paused, newInstance: false }, () => {
+    debug(this.props, 'togglePlay', '');
+    this.setState({ paused: !this.state.paused, preLoad: true }, () => {
       this.props.onPlay(!this.state.paused);
       Orientation.getOrientation((e, orientation) => {
         if (this.props.togglePlayCB) {
@@ -382,6 +399,7 @@ class Video extends Component {
   }
 
   onAudioBecomingNoisy() {
+    console.log('---->onAudioBecomingNoisy');
     if (!this.state.paused) this.togglePlay();
   }
 
@@ -434,6 +452,7 @@ class Video extends Component {
           }
           :
           {}
+//console.log(`----> renderVideoPlayer loading = ${this.state.loading} paused = ${this.state.paused} preLoad = ${this.state.preLoad} currentTime = ${this.state.currentTime} muted = ${this.state.muted} url = ${url}`);
 
     return (
         <VideoPlayer
@@ -458,7 +477,7 @@ class Video extends Component {
           style={fullScreen ? styles.fullScreen : inline}
 
           onAudioBecomingNoisy={() => this.onAudioBecomingNoisy()}
-          onLoadStart={() => this.onLoadStart()} // Callback when video starts to load
+          onLoadStart={(e) => this.onLoadStart(e)} // Callback when video starts to load
           onLoad={e => this.onLoad(e)} // Callback when video loads
           onProgress={e => this.progress(e)} // Callback every ~250ms with currentTime
           onEnd={() => this.onEnd()}
@@ -472,6 +491,7 @@ class Video extends Component {
   }
 
   renderPreviewImage(previewImage, style) {
+    debug(this.props, 'renderPreviewImage', '');
     return(
       <PreviewImage
         imageSource={previewImage}
@@ -479,6 +499,8 @@ class Video extends Component {
       />
     );
   }
+
+
 
   renderPlayer() {
     const {
@@ -560,11 +582,13 @@ class Video extends Component {
       >
         { <StatusBar hidden={fullScreen} /> }
         {
-          ((loading && previewImage) || currentTime < 0.01 || mediaType === 'audio') &&
+          (loading || currentTime < 0.01 || mediaType === 'audio') &&
             this.renderPreviewImage(previewImage, styles.image)
         }
-        {playbackConfig === 'postload' && newInstance && mediaType !== 'audio' ?
-          this.renderPreviewImage(previewImage, styles.previewImage) : this.renderVideoPlayer()}
+        {
+          (this.state.preLoad === true) &&
+           this.renderVideoPlayer()
+        }
         <Controls
           ref={(ref) => { this.controls = ref }}
           toggleMute={() => this.toggleMute()}
@@ -616,6 +640,7 @@ class Video extends Component {
       height: style.height,
       padding: style.padding,
     };
+    console.log('---> renderMinimizedPlayer url ', url);
     return (
       <View style={ style } >
         <VideoPlayer
@@ -630,7 +655,7 @@ class Video extends Component {
           muted={muted}
           playInBackground={playInBackground} // Audio continues to play when app entering background.
           playWhenInactive={playWhenInactive} // [iOS] Video continues to play when control or notification center are shown.
-          // progressUpdateInterval={250.0}          // [iOS] Interval to fire onProgress (default to ~250ms)
+          progressUpdateInterval={progressUpdateInterval}          // [iOS] Interval to fire onProgress (default to ~250ms)
           onLoadStart={() => this.onLoadStart()} // Callback when audio starts to load
           onLoad={e => this.onLoadAudio(e)} // Callback when audio loads
           onProgress={e => { this.progress(e); }} // Callback every ~250ms with currentTime
@@ -690,6 +715,7 @@ Video.propTypes = {
     PropTypes.object
   ]),
   loop: PropTypes.bool,
+  debug: PropTypes.bool,
   playbackConfig: PropTypes.oneOf(['autoplay', 'preload', 'postload']),
   previewImage: PropTypes.string,
   inlineOnly: PropTypes.bool,
@@ -743,6 +769,7 @@ Video.propTypes = {
 };
 
 Video.defaultProps = {
+  debug: false,
   placeholder: undefined,
   style: {},
   error: true,
@@ -783,7 +810,7 @@ Video.defaultProps = {
     bufferForPlaybackAfterRebufferMs: 5000
   },
   ignoreSilentSwitch: 'obey',
-  progressUpdateInterval: 250.0,
+  progressUpdateInterval: 1000.0,
   selectedAudioTrack: {
     type: '',
     value: ''
