@@ -38,18 +38,21 @@ const TopBar = (props) => {
     title,
     theme,
     onMorePress,
-    fullscreen
+    fullscreen,
+    fullScreenOnly
   } = props;
   return (
     <LinearGradient colors={['rgba(0,0,0,0.75)', 'rgba(0,0,0,0)']} style={styles.container}>
       <View style={styles.row}>
-        <ToggleIcon
-          onPress={() => props.toggleFS()}
-          iconOff="fullscreen"
-          iconOn="fullscreen-exit"
-          isOn={fullscreen}
-          theme={theme.fullscreen}
-        />
+        {!fullScreenOnly ? (
+          <ToggleIcon
+            onPress={() => props.toggleFS()}
+            iconOff="fullscreen"
+            iconOn="fullscreen-exit"
+            isOn={fullscreen}
+            theme={theme.fullscreen}
+          />
+        ) : null}
         <Text
           style={[styles.title, { color: theme.title }]}
           numberOfLines={1}
@@ -57,7 +60,7 @@ const TopBar = (props) => {
         >
           {title}
         </Text>
-        { more &&
+        {more &&
           <ToggleIcon
             style={styles.more}
             onPress={() => onMorePress()}

@@ -524,7 +524,9 @@ class Video extends Component {
       useTextureView,
       bufferConfig,
       playbackConfig,
-      previewImage
+      previewImage,
+      rotateToFullScreen,
+      fullScreenOnly
     } = this.props;
     const inline = {
       height: inlineHeight,
@@ -555,7 +557,7 @@ class Video extends Component {
             (styles.fullScreen, { height: this.animFullscreen })
             : { height: this.animInline },
           fullScreen ? null : style,
-          fullScreen ? { width: getWinHeight()} : { width: getWinWidth()}
+          fullScreen && rotateToFullScreen ? { width: getWinHeight()} : { width: getWinWidth()}
         ]}
       >
         { <StatusBar hidden={fullScreen} /> }
@@ -573,6 +575,7 @@ class Video extends Component {
           paused={paused}
           muted={muted}
           fullscreen={fullScreen}
+          fullScreenOnly={fullScreenOnly}
           loading={loading}
           onSeek={val => this.seek(val)}
           onSeekRelease={pos => this.onSeekRelease(pos)}

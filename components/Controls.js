@@ -166,6 +166,7 @@ class Controls extends Component {
     const {
       paused,
       fullscreen,
+      fullScreenOnly,
       muted,
       loading,
       more,
@@ -194,6 +195,7 @@ class Controls extends Component {
             theme={{ title: theme.title, more: theme.more, fullscreen: theme.fullscreen }}
             toggleFS={() => this.props.toggleFS()}
             fullscreen={fullscreen}
+            fullScreenOnly={fullScreenOnly}
           />
           <Animated.View style={[styles.flex, { transform: [{ scale: this.scale }] }]}>
             {
