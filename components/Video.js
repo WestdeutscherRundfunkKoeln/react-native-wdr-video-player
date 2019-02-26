@@ -399,7 +399,7 @@ class Video extends Component {
   }
 
   onAudioBecomingNoisy() {
-    console.log('---->onAudioBecomingNoisy');
+    debug(this.props, 'onAudioBecomingNoisy', '');
     if (!this.state.paused) this.togglePlay();
   }
 
@@ -452,7 +452,6 @@ class Video extends Component {
           }
           :
           {}
-//console.log(`----> renderVideoPlayer loading = ${this.state.loading} paused = ${this.state.paused} preLoad = ${this.state.preLoad} currentTime = ${this.state.currentTime} muted = ${this.state.muted} url = ${url}`);
 
     return (
         <VideoPlayer
@@ -640,7 +639,7 @@ class Video extends Component {
       height: style.height,
       padding: style.padding,
     };
-    console.log('---> renderMinimizedPlayer url ', url);
+    debug(this.props, 'renderMinimizedPlayer', url);
     return (
       <View style={ style } >
         <VideoPlayer
