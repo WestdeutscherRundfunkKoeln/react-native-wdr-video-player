@@ -451,8 +451,10 @@ class Video extends Component {
             selectedTextTrack: selectedTextTrack
           }
           :
-          {}
-
+          {
+            selectedTextTrack: selectedTextTrack
+          }
+    debug(this.props, 'renderVideoPlayer trackInformation = ', {...trackInformation, url: url });
     return (
         <VideoPlayer
           ref={(ref) => { this.player = ref }}
@@ -557,16 +559,7 @@ class Video extends Component {
       ...theme
     };
 
-    const trackInformation =
-          Platform.OS === 'android' ?
-          {
-            textTracks: textTracks,
-            selectedTextTrack: selectedTextTrack
-          }
-          :
-          {}
-
-
+    const showMore = textTracks && textTracks.length > 0 ? true : false;
 
     return (
       <Animated.View
@@ -604,7 +597,7 @@ class Video extends Component {
           duration={duration}
           logo={logo}
           title={title}
-          more={!!onMorePress}
+          more={showMore}
           onMorePress={() => onMorePress()}
           theme={setTheme}
           minimized={minimized}
