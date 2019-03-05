@@ -618,7 +618,7 @@ class Video extends Component {
     const { url, loop, title, logo, rate, style, volume, placeholder, theme,
       onTimedMetadata, resizeMode, onMorePress, inlineOnly, minimized,
       playInBackground, playWhenInactive, onSettingsPress, onClosePress,
-      alternatePlayBtn, mediaType } = this.props;
+      progressUpdateInterval, alternatePlayBtn, mediaType } = this.props;
     const inline = {
       height: 150,
       alignSelf: 'stretch'
