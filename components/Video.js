@@ -141,7 +141,7 @@ class Video extends Component {
         if (this.props.fullScreenOnly) {
           this.setState({ fullScreen: true }, () => {
             this.props.onFullScreen(this.state.fullScreen);
-            this.animToFullscreen(getWinHeight());
+            this.animToFullscreen(getWinWidth());
             if (this.props.rotateToFullScreen) Orientation.lockToLandscape()
           })
         }
@@ -330,6 +330,7 @@ class Video extends Component {
   }
 
   animToFullscreen(height) {
+    debug(this.props, 'animToFullscreen height', height );
     Animated.parallel([
       Animated.timing(this.animFullscreen, { toValue: height, duration: 200 }),
       Animated.timing(this.animInline, { toValue: height, duration: 200 })
@@ -337,6 +338,7 @@ class Video extends Component {
   }
 
   animToInline(height) {
+    debug(this.props, 'animToInline height', height )
     const newHeight = height || this.state.inlineHeight
     Animated.parallel([
       Animated.timing(this.animFullscreen, { toValue: newHeight, duration: 100 }),
