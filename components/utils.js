@@ -18,6 +18,12 @@ export const getWinHeight = () => {
   Dimensions.get('window').height : Dimensions.get('window').width;
 };
 
+
+export const getSmallSide = () => {
+  return Dimensions.get('window').width < Dimensions.get('window').height ?
+  Dimensions.get('window').width : Dimensions.get('window').height;
+};
+
 export const getInlineHeight = () => {
   return getWinWidth() * RECIPROCAL_PAGE_RATIO;
 };

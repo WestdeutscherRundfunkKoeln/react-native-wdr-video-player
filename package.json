@@ -1,6 +1,6 @@
 {
   "name": "react-native-wdr-video-player",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-jest": "21.2.0",
