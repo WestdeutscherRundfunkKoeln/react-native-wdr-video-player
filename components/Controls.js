@@ -116,9 +116,9 @@ class Controls extends Component {
           {
             alternatePlayBtn ?
               (
-                <StyledPlayButton 
-                  onPress={() => { this.setState({ firstToggle: false }); return this.props.togglePlay()}} 
-                  paused={true} 
+                <StyledPlayButton
+                  onPress={() => { this.setState({ firstToggle: false }); return this.props.togglePlay()}}
+                  paused={true}
                   mediaType={mediaType}
                 />
               ) :
@@ -185,9 +185,16 @@ class Controls extends Component {
 
     const { center, ...controlBar } = theme;
 
+    const container = {
+      ...StyleSheet.absoluteFillObject,
+      top:  fullscreen ? 10 : 0,
+      bottom: fullscreen ? 24 : 0,
+      zIndex: 99
+    };
+
     return (
       <Touchable onPress={() => this.hideControls()}>
-        <Animated.View style={[styles.container, { opacity: this.animControls }]}>
+        <Animated.View style={[container, { opacity: this.animControls }]}>
           <TopBar
             title={title}
             more={more}
