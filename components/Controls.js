@@ -4,6 +4,7 @@ import {
   View,
   Animated,
   StyleSheet,
+  Platform,
   TouchableWithoutFeedback as Touchable
 } from 'react-native'
 import {
@@ -187,8 +188,8 @@ class Controls extends Component {
 
     const container = {
       ...StyleSheet.absoluteFillObject,
-      top:  fullscreen ? 10 : 0,
-      bottom: fullscreen ? 24 : 0,
+      top:  fullscreen && Platform.OS === 'android' ? 10 : 0,
+      bottom: fullscreen && Platform.OS === 'android' ? 24 : 0,
       zIndex: 99
     };
 
