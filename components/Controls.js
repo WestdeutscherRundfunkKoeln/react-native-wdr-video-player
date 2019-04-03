@@ -4,6 +4,7 @@ import {
   View,
   Animated,
   StyleSheet,
+  Platform,
   TouchableWithoutFeedback as Touchable
 } from 'react-native'
 import {
@@ -116,9 +117,9 @@ class Controls extends Component {
           {
             alternatePlayBtn ?
               (
-                <StyledPlayButton 
-                  onPress={() => { this.setState({ firstToggle: false }); return this.props.togglePlay()}} 
-                  paused={true} 
+                <StyledPlayButton
+                  onPress={() => { this.setState({ firstToggle: false }); return this.props.togglePlay()}}
+                  paused={true}
                   mediaType={mediaType}
                 />
               ) :
@@ -185,9 +186,16 @@ class Controls extends Component {
 
     const { center, ...controlBar } = theme;
 
+    const container = {
+      ...StyleSheet.absoluteFillObject,
+      top:  fullscreen && Platform.OS === 'android' ? 10 : 0,
+      bottom: fullscreen && Platform.OS === 'android' ? 24 : 0,
+      zIndex: 99
+    };
+
     return (
       <Touchable onPress={() => this.hideControls()}>
-        <Animated.View style={[styles.container, { opacity: this.animControls }]}>
+        <Animated.View style={[container, { opacity: this.animControls }]}>
           <TopBar
             title={title}
             more={more}
