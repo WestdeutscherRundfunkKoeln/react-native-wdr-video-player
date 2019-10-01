@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Slider as RNSlider
 } from 'react-native'
-import Slider from 'react-native-slider'
+import Slider from './Slider'
 
 const styles = StyleSheet.create({
   container: {
