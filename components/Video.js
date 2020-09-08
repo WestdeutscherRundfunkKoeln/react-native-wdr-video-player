@@ -499,12 +499,17 @@ class Video extends Component {
 
   renderPreviewImage(previewImage, style) {
     debug(this.props, 'renderPreviewImage', '');
-    return(
-      <PreviewImage
-        imageSource={previewImage}
-        imageStyle={style}
-      />
-    );
+    if (this.state.loading === true) {
+      return null;
+    }
+    else {
+      return(
+        <PreviewImage
+          imageSource={previewImage}
+          imageStyle={style}
+        />
+      );
+    }
   }
 
 
