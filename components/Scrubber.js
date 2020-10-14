@@ -4,9 +4,9 @@ import {
   View,
   Platform,
   StyleSheet,
-  Slider as RNSlider
 } from 'react-native'
 import Slider from './Slider'
+import { Slider as RNSlider } from '@react-native-community/slider'
 
 const styles = StyleSheet.create({
   container: {
