@@ -5,8 +5,8 @@ import {
   Platform,
   StyleSheet,
 } from 'react-native'
-import Slider from './Slider'
-import { Slider as RNSlider } from '@react-native-community/slider'
+import SlideriOS from './Slider'
+import Slider from '@react-native-community/slider'
 
 const styles = StyleSheet.create({
   container: {
@@ -31,7 +31,7 @@ const Scrubber = (props) => {
   return (
     <View style={styles.container}>
       { Platform.OS === 'ios' ?
-        <Slider
+        <SlideriOS
           onValueChange={val => onSeek(val)}
           onSlidingComplete={val => onSeekRelease(val)}
           value={progress === Number.POSITIVE_INFINITY ? 0 : progress}
@@ -43,7 +43,7 @@ const Scrubber = (props) => {
           trackClickable
         />
       :
-        <RNSlider
+        <Slider
           style={styles.slider}
           onValueChange={val => onSeek(val)}
           onSlidingComplete={val => onSeekRelease(val)}

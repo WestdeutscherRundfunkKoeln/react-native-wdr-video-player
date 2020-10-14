@@ -48,7 +48,7 @@ const DEFAULT_ANIMATION_CONFIGS = {
   // }
 };
 
-export default class Slider extends PureComponent {
+export default class SlideriOS extends PureComponent {
   static propTypes = {
     /**
      * Initial value of the slider. The value should be between minimumValue
